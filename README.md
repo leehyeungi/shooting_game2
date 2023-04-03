@@ -78,7 +78,7 @@ class Player(Animation):
 
 # 적 클래스
 class Enemy(Animation):
-    def __init__(self):
+    def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.sprite_image = 'enemys.png'
         self.sprite_width = 92
@@ -87,7 +87,9 @@ class Enemy(Animation):
         self.fps = 8
         self.speed = random.randint(1, 5) #스피드 랜덤
         self.init_animation()
-
+        self.rect.x = x
+        self.rect.y = y
+        
     def update(self):
         self.image.set_colorkey(Color(255, 255, 255))
         self.rect.y += self.speed
@@ -124,19 +126,17 @@ player.rect.y = 450
 player_group = pygame.sprite.Group()
 player_group.add(player)
 
+bullets = 0
+enemy_count = 0
+
 bullet_group = pygame.sprite.Group()
-for i in range(10):
+for i in range(1000):
     b = Bullet()
     b.rect.x = -1000
     b.rect.y = -1000
     bullet_group.add(b)
 
-enemy_group = pygame.sprite.Group()
-
-bullets = 0
-enemy_count = 0
-
-#적 X좌표 생성
+#적의 좌표 생성
 enemys_x = []
 enemys_y = []
 
@@ -144,8 +144,10 @@ for i in range(20):
     enemys_x.append(random.randint(0, 400))
     enemys_y.append(random.randint(-400, 0))
 
-for k in range(10):
-    enemy = enemys_x, enemys_y
+enemy_group = pygame.sprite.Group()
+
+for k in range(20):
+    enemy = Enemy(enemys_x[k], enemys_y[k])
     enemy_group.add(enemy)
 
 # 게임 루프
@@ -160,10 +162,10 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 #중심에 들어가게 만들기
-                bullet_group.sprites()[bullets].shoot(player.rect.x + player.rect.x//2, player.rect.y)
+                bullet_group.sprites()[bullets].shoot(player.rect.x + player.rect.x / 2, player.rect.y)
                 bullets += 1
-                if bullets == 10:
-                    bullets = 0
+                if bullets == 1000:
+                    running = False
 
     # 게임 상태 업데이트
     player_group.update()
